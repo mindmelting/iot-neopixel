@@ -38,7 +38,7 @@ EOF
 }
 
 resource "aws_iam_policy" "iot" {
-  name = "Neopixel IoT"
+  name = "NeopixelIoT"
 
   policy = <<EOF
 {
