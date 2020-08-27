@@ -61,6 +61,11 @@ resource "aws_iam_role_policy_attachment" "iot" {
   policy_arn = aws_iam_policy.iot.arn
 }
 
+resource "aws_iam_role_policy_attachment" "cloudwatch" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
