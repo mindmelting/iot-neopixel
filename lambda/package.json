@@ -11,7 +11,5 @@
   "dependencies": {
     "actions-on-google": "^2.13.0"
   },
-  "devDependencies": {
-    "awssdk": "^1.0.1"
-  }
+  "devDependencies": {}
 }

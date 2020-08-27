@@ -1,6 +1,6 @@
 "use strict";
 
-const AWS = require("awssdk");
+const AWS = require("aws-sdk");
 
 var iotdata = new AWS.IotData({
   endpoint: "au4crrz84uqsr-ats.iot.ap-southeast-2.amazonaws.com",
