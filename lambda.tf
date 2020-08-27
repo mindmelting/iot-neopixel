@@ -37,6 +37,30 @@ EOF
 
 }
 
+resource "aws_iam_policy" "iot" {
+  name = "Neopixel IoT"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "iot:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "iot" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.iot.arn
+}
+
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
