@@ -12,3 +12,7 @@ output "neopixel_private_key" {
   value       = aws_iot_certificate.neopixel_cert.private_key
   description = "Neopixel private key"
 }
+
+output "base_url" {
+  value = aws_api_gateway_deployment.neopixel.invoke_url
+}
