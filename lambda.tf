@@ -3,6 +3,8 @@ resource "aws_lambda_function" "neopixel" {
 
   filename = "./lambda.zip"
 
+  source_code_hash = filebase64sha256("./lambda.zip")
+
   # "main" is the filename within the zip file (main.js) and "handler"
   # is the name of the property under which the handler function was
   # exported in that file.
