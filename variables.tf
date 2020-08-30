@@ -1,4 +1,4 @@
 variable "thing_name" {
   type = string
-  default = "neopixel"
+  default = "arduino_neopixel"
 }
