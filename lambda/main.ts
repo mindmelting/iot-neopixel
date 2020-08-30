@@ -1,15 +1,12 @@
 "use strict";
 
-const {
-  smarthome
-} = require('actions-on-google')
+import { IotData } from 'aws-sdk';
+import { smarthome } from 'actions-on-google';
 
 // Create an app instance
 const app = smarthome({
   debug: true
 })
-
-const AWS = require("aws-sdk");
 
 
 if(!process.env.IOT_ENDPOINT) {
@@ -22,12 +19,12 @@ if(!process.env.IOT_THING_NAME) {
 
 const thingName = process.env.IOT_THING_NAME;
 
-const iotdata = new AWS.IotData({
+const iotdata = new IotData({
   endpoint: process.env.IOT_ENDPOINT,
 });
 
 app.onExecute(async (body) => {
-  const lightStatus = body.inputs[0].payload.commands[0].execution[0].params.on;
+  const lightStatus = body.inputs[0].payload.commands[0].execution[0].params?.on;
   const params = {
     thingName,
     payload: JSON.stringify({
@@ -61,6 +58,7 @@ app.onQuery(async (body) => {
     thingName
   };
   const res = await iotdata.getThingShadow(params).promise();
+  // @ts-ignore
   const payload = JSON.parse(res.payload);
   const lightStatus = payload.state.reported.light === "on";
 
@@ -78,7 +76,7 @@ app.onQuery(async (body) => {
   };
 })
 
-app.onSync((body) => {
+app.onSync(async (body) => {
   return {
     requestId: body.requestId,
     payload: {
@@ -91,6 +89,7 @@ app.onSync((body) => {
         ],
         name: {
           name: "Neopixel",
+          defaultNames: ["reading light"],
           nicknames: ["reading light"]
         },
         willReportState: false,
