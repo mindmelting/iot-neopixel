@@ -1,5 +1,7 @@
-resource "aws_lambda_function" "neopixel" {
-  function_name = "Neopixel"
+data "aws_iot_endpoint" "iot" {}
+
+resource "aws_lambda_function" "iot" {
+  function_name = "IoT"
 
   filename = "./lambda.zip"
 
@@ -12,12 +14,19 @@ resource "aws_lambda_function" "neopixel" {
   runtime = "nodejs10.x"
 
   role = aws_iam_role.lambda_exec.arn
+
+  environment {
+    variables = {
+      "IOT_ENDPOINT" = data.aws_iot_endpoint.iot.endpoint_address
+      "IOT_THING_NAME" = var.thing_name
+    }
+  }
 }
 
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "lambda_exec" {
-  name = "neopixel_lambda"
+  name = "iot_lambda"
 
   assume_role_policy = <<EOF
 {
@@ -38,7 +47,7 @@ EOF
 }
 
 resource "aws_iam_policy" "iot" {
-  name = "NeopixelIoT"
+  name = "IoT"
 
   policy = <<EOF
 {
@@ -69,10 +78,10 @@ resource "aws_iam_role_policy_attachment" "cloudwatch" {
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = aws_lambda_function.neopixel.function_name
+   function_name = aws_lambda_function.iot.function_name
    principal     = "apigateway.amazonaws.com"
 
    # The "/*/*" portion grants access from any method on any resource
    # within the API Gateway REST API.
-   source_arn = "${aws_api_gateway_rest_api.neopixel.execution_arn}/*/*"
+   source_arn = "${aws_api_gateway_rest_api.iot.execution_arn}/*/*"
 }

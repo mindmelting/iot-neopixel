@@ -1,18 +1,18 @@
-resource "aws_iot_thing" "neopixel" {
-  name = "neopixel"
+resource "aws_iot_thing" "iot" {
+  name = var.thing_name
 }
 
-resource "aws_iot_certificate" "neopixel_cert" {
+resource "aws_iot_certificate" "iot_cert" {
   active = true
 }
 
 resource "aws_iot_thing_principal_attachment" "att" {
-  principal = aws_iot_certificate.neopixel_cert.arn
-  thing     = aws_iot_thing.neopixel.name
+  principal = aws_iot_certificate.iot_cert.arn
+  thing     = aws_iot_thing.iot.name
 }
 
-resource "aws_iot_policy" "nexopixel_pub_sub" {
-  name = "NeopixelPubSub"
+resource "aws_iot_policy" "iot_pub_sub" {
+  name = "IoTPubSub"
 
   policy = <<EOF
 {
@@ -31,6 +31,6 @@ EOF
 }
 
 resource "aws_iot_policy_attachment" "att" {
-  policy = aws_iot_policy.nexopixel_pub_sub.name
-  target = aws_iot_certificate.neopixel_cert.arn
+  policy = aws_iot_policy.iot_pub_sub.name
+  target = aws_iot_certificate.iot_cert.arn
 }
