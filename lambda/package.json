@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "webpack && zip build/main.zip build/main.js",
+    "build": "webpack && cd build && zip main.zip main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
