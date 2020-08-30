@@ -3,9 +3,9 @@ data "aws_iot_endpoint" "iot" {}
 resource "aws_lambda_function" "iot" {
   function_name = "IoT"
 
-  filename = "./lambda.zip"
+  filename = "./lambda/build/main.zip"
 
-  source_code_hash = filebase64sha256("./lambda.zip")
+  source_code_hash = filebase64sha256("./lambda/build/main.zip")
 
   # "main" is the filename within the zip file (main.js) and "handler"
   # is the name of the property under which the handler function was

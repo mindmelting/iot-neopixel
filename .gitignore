@@ -1,3 +1,4 @@
+.DS_Store
 # Local .terraform directories
 **/.terraform/*
 
@@ -29,3 +30,4 @@ override.tf.json
 # example: *tfplan*
 
 node_modules/
+lambda/build/*.js
