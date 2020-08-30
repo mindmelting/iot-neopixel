@@ -45,6 +45,7 @@ const COMMAND_MAP: ICommandOptions = {
 };
 
 app.onExecute(async (body) => {
+  console.log("Execute");
   const currParams = body.inputs[0].payload.commands[0].execution.reduce(
     (prev, curr) => {
       return {
@@ -122,6 +123,7 @@ app.onQuery(async (body) => {
 });
 
 app.onSync(async (body) => {
+  console.log("Sync");
   return {
     requestId: body.requestId,
     payload: {
