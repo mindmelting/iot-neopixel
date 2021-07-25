@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "webpack && cd build && zip main.zip main.js",
+    "build": "tsc main.ts && zip -r ../lambda.zip *",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,11 +13,7 @@
     "actions-on-google": "^2.13.0"
   },
   "devDependencies": {
-    "@tsconfig/node10": "^1.0.7",
-    "aws-sdk": "^2.742.0",
-    "ts-loader": "^8.0.3",
-    "typescript": "^4.0.2",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "@tsconfig/node10": "^1.0.8",
+    "aws-sdk": "^2.742.0"
   }
 }
