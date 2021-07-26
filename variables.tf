@@ -1,4 +1,5 @@
-variable "thing_name" {
-  type = string
-  default = "arduino_neopixel"
+variable "things" {
+  type = list(string)
+  description = "List of devices to create in AWS IoT"
+  default = ["arduino_neopixel"]
 }

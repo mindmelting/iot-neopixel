@@ -3,9 +3,9 @@ data "aws_iot_endpoint" "iot" {}
 resource "aws_lambda_function" "iot" {
   function_name = "IoT"
 
-  filename = "./lambda/build/main.zip"
+  filename = "./lambda.zip"
 
-  source_code_hash = filebase64sha256("./lambda/build/main.zip")
+  source_code_hash = filebase64sha256("./lambda.zip")
 
   # "main" is the filename within the zip file (main.js) and "handler"
   # is the name of the property under which the handler function was
@@ -18,7 +18,7 @@ resource "aws_lambda_function" "iot" {
   environment {
     variables = {
       "IOT_ENDPOINT" = data.aws_iot_endpoint.iot.endpoint_address
-      "IOT_THING_NAME" = var.thing_name
+      "IOT_THINGS" = join(",",var.things)
     }
   }
 }

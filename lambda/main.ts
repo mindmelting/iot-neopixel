@@ -12,11 +12,11 @@ if (!process.env.IOT_ENDPOINT) {
   throw new Error("Requires IOT_ENDPOINT");
 }
 
-if (!process.env.IOT_THING_NAME) {
-  throw new Error("Requires IOT_THING_NAME");
+if (!process.env.IOT_THINGS) {
+  throw new Error("Requires IOT_THINGS");
 }
 
-const thingName = process.env.IOT_THING_NAME;
+const things = process.env.IOT_THINGS.split(",");
 
 const iotdata = new IotData({
   endpoint: process.env.IOT_ENDPOINT,
@@ -44,8 +44,10 @@ const COMMAND_MAP: ICommandOptions = {
   "action.devices.commands.BrightnessAbsolute": getBrightnessParam,
 };
 
+// This needs refactoring to capture multiple commands
 app.onExecute(async (body) => {
   console.log("Execute");
+  const deviceIds = body.inputs[0].payload.commands[0].devices.map(device => device.id);
   const currParams = body.inputs[0].payload.commands[0].execution.reduce(
     (prev, curr) => {
       return {
@@ -67,22 +69,21 @@ app.onExecute(async (body) => {
     {}
   );
 
-  const params = {
-    thingName,
+  await Promise.all(deviceIds.map(id => iotdata.updateThingShadow({
+    thingName: id,
     payload: JSON.stringify({
       state: {
         desired: desiredParams,
       },
     }),
-  };
-  await iotdata.updateThingShadow(params).promise();
+  }).promise()));
 
   return {
     requestId: body.requestId,
     payload: {
       commands: [
         {
-          ids: ["1"],
+          ids: deviceIds,
           status: "SUCCESS",
           states: {
             online: true,
@@ -96,28 +97,30 @@ app.onExecute(async (body) => {
 
 app.onQuery(async (body) => {
   console.log("Query");
-  const params = {
-    thingName,
-  };
-  const res = await iotdata.getThingShadow(params).promise();
-  // @ts-ignore
-  const payload = JSON.parse(res.payload);
-  const lightStatus = payload.state.reported.light === "on";
-  const reportedBrightness = payload.state.reported.brightness || 0;
-  const brightness = Math.round((reportedBrightness / 255) * 100);
+
+  const deviceIds = body.inputs[0].payload.devices.map(device => device.id);
+
+  const res = await Promise.all(deviceIds.map(id => iotdata.getThingShadow({ thingName: id }).promise()));
+  const payloads = res.map(el => JSON.parse(el.payload!.toString()));
 
   return {
     requestId: body.requestId,
     payload: {
       agentUserId: "1",
-      devices: {
-        1: {
-          online: true,
-          on: lightStatus,
-          brightness,
-          status: "SUCCESS",
-        },
-      },
+      devices: payloads.reduce((curr, payload, idx) => {
+        const reportedBrightness = payload.state.reported.brightness || 0;
+        const brightness = Math.round((reportedBrightness / 255) * 100);
+
+        return {
+          ...curr,
+          [deviceIds[idx]]: {
+            online: true,
+            on: payload.state.reported.light === "on",
+            brightness,
+            status: "SUCCESS",
+          }
+        }
+      }, {}),
     },
   };
 });
@@ -128,23 +131,21 @@ app.onSync(async (body) => {
     requestId: body.requestId,
     payload: {
       agentUserId: "1",
-      devices: [
-        {
-          id: "1",
-          type: "action.devices.types.LIGHT",
-          traits: [
-            "action.devices.traits.OnOff",
-            "action.devices.traits.Brightness",
-          ],
-          name: {
-            name: "Neopixel",
-            defaultNames: ["reading light"],
-            nicknames: ["reading light"],
-          },
-          willReportState: false,
-          roomHint: "bedroom",
+      devices: things.map((thingName, idx) => ({
+        id: thingName,
+        type: "action.devices.types.LIGHT",
+        traits: [
+          "action.devices.traits.OnOff",
+          "action.devices.traits.Brightness",
+        ],
+        name: {
+          name: thingName,
+          defaultNames: ["reading light"],
+          nicknames: ["reading light"],
         },
-      ],
+        willReportState: false,
+        roomHint: "bedroom",
+      })),
     },
   };
 });
