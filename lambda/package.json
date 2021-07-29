@@ -4,12 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "npm run layer-clean && npm run ts-build && npm run zip-lambda && npm run layer-build && npm run zip-layer",
-    "ts-build": "tsc main.ts",
-    "layer-clean": "rm -rf build/ && mkdir -p build/nodejs/",
-    "layer-build": " cp package.json build/nodejs/package.json && (cd build/nodejs && npm install --production)",
-    "zip-lambda": "zip -r ../lambda.zip * -x 'node_modules/*' -x 'build/*'",
-    "zip-layer": "(cd build && zip -r ../../layer.zip *)",
+    "build": "tsc main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
