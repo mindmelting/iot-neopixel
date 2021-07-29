@@ -2,8 +2,8 @@ data "aws_iot_endpoint" "iot" {}
 
 resource "aws_lambda_function" "iot_gh_event" {
   function_name    = "iot-google-home-event"
-  filename         = "./lambda.zip"
-  source_code_hash = filebase64sha256("./lambda.zip")
+  filename         = "./lambda/build/lambda.zip"
+  source_code_hash = filebase64sha256("./lambda/build/lambda.zip")
   handler          = "main.ghevent"
   runtime          = "nodejs14.x"
   layers           = [aws_lambda_layer_version.node_layer.arn]
@@ -20,8 +20,8 @@ resource "aws_lambda_function" "iot_gh_event" {
 
 resource "aws_lambda_function" "iot_gh_state" {
   function_name    = "iot-google-report-state"
-  filename         = "./lambda.zip"
-  source_code_hash = filebase64sha256("./lambda.zip")
+  filename         = "./lambda/build/lambda.zip"
+  source_code_hash = filebase64sha256("./lambda/build/lambda.zip")
   handler          = "main.ghstate"
   runtime          = "nodejs14.x"
   layers           = [aws_lambda_layer_version.node_layer.arn]
@@ -44,8 +44,8 @@ resource "aws_lambda_function" "iot_gh_state" {
 
 resource "aws_lambda_layer_version" "node_layer" {
   layer_name          = "iot-node-layer"
-  filename            = "./layer.zip"
-  source_code_hash    = filebase64sha256("./layer.zip")
+  filename            = "./lambda/build/layer.zip"
+  source_code_hash    = filebase64sha256("./lambda/build/layer.zip")
   compatible_runtimes = ["nodejs14.x"]
 
 }

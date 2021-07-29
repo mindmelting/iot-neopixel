@@ -4,6 +4,13 @@ terraform {
       source = "hashicorp/aws"
     }
   }
+  backend "remote" {
+    organization = "mindmelting"
+
+    workspaces {
+      name = "iot-neopixel"
+    }
+  }
 }
 
 provider "aws" {
