@@ -1,51 +1,51 @@
 data "aws_iot_endpoint" "iot" {}
 
 resource "aws_lambda_function" "iot_gh_event" {
-  function_name = "iot-google-home-event"
-  filename = "./lambda.zip"
+  function_name    = "iot-google-home-event"
+  filename         = "./lambda.zip"
   source_code_hash = filebase64sha256("./lambda.zip")
-  handler = "main.ghevent"
-  runtime = "nodejs14.x"
-  layers = [aws_lambda_layer_version.node_layer.arn]
+  handler          = "main.ghevent"
+  runtime          = "nodejs14.x"
+  layers           = [aws_lambda_layer_version.node_layer.arn]
 
   role = aws_iam_role.lambda_iam_role.arn
 
   environment {
     variables = {
       "IOT_ENDPOINT" = data.aws_iot_endpoint.iot.endpoint_address
-      "IOT_THINGS" = join(",", aws_iot_thing.iot_thing.*.name)
+      "IOT_THINGS"   = join(",", aws_iot_thing.iot_thing.*.name)
     }
   }
 }
 
 resource "aws_lambda_function" "iot_gh_state" {
-  function_name = "iot-google-report-state"
-  filename = "./lambda.zip"
+  function_name    = "iot-google-report-state"
+  filename         = "./lambda.zip"
   source_code_hash = filebase64sha256("./lambda.zip")
-  handler = "main.ghstate"
-  runtime = "nodejs14.x"
-  layers = [aws_lambda_layer_version.node_layer.arn]
+  handler          = "main.ghstate"
+  runtime          = "nodejs14.x"
+  layers           = [aws_lambda_layer_version.node_layer.arn]
 
   role = aws_iam_role.lambda_iam_role.arn
 
   environment {
     variables = {
-      "IOT_ENDPOINT" = data.aws_iot_endpoint.iot.endpoint_address
-      "IOT_THINGS" = join(",",aws_iot_thing.iot_thing.*.name)
-      "GOOGLE_PROJECT_ID" = var.google_project_id
+      "IOT_ENDPOINT"          = data.aws_iot_endpoint.iot.endpoint_address
+      "IOT_THINGS"            = join(",", aws_iot_thing.iot_thing.*.name)
+      "GOOGLE_PROJECT_ID"     = var.google_project_id
       "GOOGLE_PRIVATE_KEY_ID" = var.google_private_key_id
-      "GOOGLE_PRIVATE_KEY" = var.google_private_key
-      "GOOGLE_CLIENT_EMAIL" = var.google_client_email
-      "GOOGLE_CLIENT_ID" = var.google_client_id
-      "GOOGLE_X509_CERT_URL" = var.google_x509_cert_url
+      "GOOGLE_PRIVATE_KEY"    = var.google_private_key
+      "GOOGLE_CLIENT_EMAIL"   = var.google_client_email
+      "GOOGLE_CLIENT_ID"      = var.google_client_id
+      "GOOGLE_X509_CERT_URL"  = var.google_x509_cert_url
     }
   }
 }
 
 resource "aws_lambda_layer_version" "node_layer" {
-  layer_name = "iot-node-layer"
-  filename = "./layer.zip"
-  source_code_hash = filebase64sha256("./layer.zip")
+  layer_name          = "iot-node-layer"
+  filename            = "./layer.zip"
+  source_code_hash    = filebase64sha256("./layer.zip")
   compatible_runtimes = ["nodejs14.x"]
 
 }
@@ -57,12 +57,12 @@ resource "aws_iam_role" "lambda_iam_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action: "sts:AssumeRole",
-        Principal: {
-          Service: "lambda.amazonaws.com"
+        Action : "sts:AssumeRole",
+        Principal : {
+          Service : "lambda.amazonaws.com"
         },
-        Effect: "Allow",
-        Sid: ""
+        Effect : "Allow",
+        Sid : ""
       },
     ]
   })
@@ -79,20 +79,20 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_attachment" {
 }
 
 resource "aws_lambda_permission" "apigw_gh_event" {
-   statement_id  = "AllowAPIGatewayInvoke"
-   action        = "lambda:InvokeFunction"
-   function_name = aws_lambda_function.iot_gh_event.function_name
-   principal     = "apigateway.amazonaws.com"
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.iot_gh_event.function_name
+  principal     = "apigateway.amazonaws.com"
 
-   # The "/*/*" portion grants access from any method on any resource
-   # within the API Gateway REST API.
-   source_arn = "${aws_api_gateway_rest_api.iot.execution_arn}/*/*"
+  # The "/*/*" portion grants access from any method on any resource
+  # within the API Gateway REST API.
+  source_arn = "${aws_api_gateway_rest_api.iot.execution_arn}/*/*"
 }
 
 resource "aws_lambda_permission" "iot_core_gh_state" {
-   statement_id  = "AllowIoTGatewayInvoke"
-   action        = "lambda:InvokeFunction"
-   function_name = aws_lambda_function.iot_gh_state.function_name
-   principal     = "iot.amazonaws.com"
-   source_arn = aws_iot_topic_rule.delta_iot_topic_rule.arn
+  statement_id  = "AllowIoTGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.iot_gh_state.function_name
+  principal     = "iot.amazonaws.com"
+  source_arn    = aws_iot_topic_rule.delta_iot_topic_rule.arn
 }

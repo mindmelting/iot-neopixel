@@ -9,5 +9,5 @@ resource "aws_iam_user_policy_attachment" "homebridge_attachment" {
 }
 
 resource "aws_iam_access_key" "homebridge_iam_access_key" {
-  user    = aws_iam_user.homebridge_iam_user.name
+  user = aws_iam_user.homebridge_iam_user.name
 }

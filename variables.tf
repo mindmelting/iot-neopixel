@@ -1,7 +1,7 @@
 variable "things" {
-  type = list(string)
+  type        = list(string)
   description = "List of devices to create in AWS IoT"
-  default = ["neopixel"]
+  default     = ["neopixel"]
 }
 
 variable "google_project_id" {
@@ -13,7 +13,7 @@ variable "google_private_key_id" {
 }
 
 variable "google_private_key" {
-  type = string
+  type      = string
   sensitive = true
 }
 

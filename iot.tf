@@ -1,15 +1,15 @@
 resource "aws_iot_thing" "iot_thing" {
   count = length(var.things)
-  name = var.things[count.index]
+  name  = var.things[count.index]
 }
 
 resource "aws_iot_certificate" "iot_certificate" {
-  count = length(var.things)
+  count  = length(var.things)
   active = true
 }
 
 resource "aws_iot_thing_principal_attachment" "iot_thing_attachment" {
-  count = length(var.things)
+  count     = length(var.things)
   principal = aws_iot_certificate.iot_certificate[count.index].arn
   thing     = aws_iot_thing.iot_thing[count.index].name
 }
@@ -42,15 +42,15 @@ resource "aws_iam_policy" "iot_shadow_iam_policy" {
           "iot:GetThingShadow",
           "iot:UpdateThingShadow"
         ]
-        Effect    = "Allow"
-        Resource  = aws_iot_thing.iot_thing.*.arn
+        Effect   = "Allow"
+        Resource = aws_iot_thing.iot_thing.*.arn
       },
     ]
   })
 }
 
 resource "aws_iot_policy_attachment" "iot_policy_attachment" {
-  count = length(var.things)
+  count  = length(var.things)
   policy = aws_iot_policy.iot_policy.name
   target = aws_iot_certificate.iot_certificate[count.index].arn
 }
