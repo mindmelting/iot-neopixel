@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "iot" {
-  name        = "IoT"
+  name        = "iot"
   description = "IoT Application"
 }
 
@@ -23,7 +23,7 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = aws_lambda_function.iot.invoke_arn
+   uri                     = aws_lambda_function.iot_gh_event.invoke_arn
 }
 
 resource "aws_api_gateway_method" "proxy_root" {
@@ -40,7 +40,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = aws_lambda_function.iot.invoke_arn
+   uri                     = aws_lambda_function.iot_gh_event.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "iot" {
