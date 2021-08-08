@@ -41,10 +41,10 @@ jobs:
         working-directory: "./lambda/build/nodejs"
 
       - name: Zip Lambda function
-        run: zip -r build/lambda.zip **/*.js -x 'node_modules/*' -x 'build/*'
+        run: zip -r build/lambda.zip *.js **/*.js -x 'node_modules/*' -x 'build/*'
         working-directory: "./lambda"
 
-      - name: Zipinfo
+      - name: Zipinfo lambda
         run: zipinfo ./lambda.zip
         working-directory: "./lambda/build"
 
