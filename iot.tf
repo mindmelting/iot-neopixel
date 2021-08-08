@@ -1,4 +1,6 @@
-data "aws_iot_endpoint" "iot" {}
+data "aws_iot_endpoint" "iot" {
+  endpoint_type = "iot:Data-ATS"
+}
 
 resource "aws_iot_thing" "iot_thing" {
   count = length(var.things)
