@@ -20,7 +20,7 @@ interface IoTRuleEvent {
 
 const app = smarthome({
   debug: true,
-  jwt: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!)
+  jwt: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '')
 });
 
 const transformDeltaState = (deltaState: IoTShadowState): GHState => {
