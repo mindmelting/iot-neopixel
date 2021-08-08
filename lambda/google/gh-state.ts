@@ -1,7 +1,8 @@
 "use strict";
 
 import { v4 as uuidv4 } from "uuid";
-import { homegraph, AuthPlus } from "@googleapis/homegraph";
+import { GoogleAuth } from "google-auth-library";
+import { homegraph } from "@googleapis/homegraph";
 
 interface IoTShadowState {
   light?: string;
@@ -18,15 +19,19 @@ interface IoTRuleEvent {
   state: IoTShadowState;
 }
 
+const googleServiceJSON =
+  process.env.GOOGLE_SERVICE_ACCOUNT_JSON &&
+  JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+
 const app = homegraph({
   version: "v1",
-  auth: new AuthPlus({
-    credentials:
-      process.env.GOOGLE_SERVICE_ACCOUNT_JSON &&
-      JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
-    clientOptions: {
-      scopes: ["https://www.googleapis.com/auth/homegraph"],
+  auth: new GoogleAuth({
+    projectId: googleServiceJSON.project_id,
+    credentials: {
+      client_email: googleServiceJSON.client_email,
+      private_key: googleServiceJSON.private_key
     },
+    scopes: ["https://www.googleapis.com/auth/homegraph"],
   }),
 });
 

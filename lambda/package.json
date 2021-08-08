@@ -12,6 +12,7 @@
   "dependencies": {
     "@googleapis/homegraph": "^2.0.0",
     "actions-on-google": "^2.13.0",
+    "google-auth-library": "^7.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
