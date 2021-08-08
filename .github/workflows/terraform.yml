@@ -44,6 +44,10 @@ jobs:
         run: zip -r build/lambda.zip **/*.js -x 'node_modules/*' -x 'build/*'
         working-directory: "./lambda"
 
+      - name: Zipinfo
+        run: zipinfo ./lambda.zip
+        working-directory: "./lambda/build"
+
       - name: Zip Lambda layer
         run: zip -r layer.zip nodejs/
         working-directory: "./lambda/build"
