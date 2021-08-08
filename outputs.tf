@@ -16,6 +16,11 @@ output "iot_private_key" {
   sensitive   = true
 }
 
+output "iot_endpoint" {
+  value       = data.aws_iot_endpoint.iot.endpoint_address
+  description = "IoT endpoint address"
+}
+
 output "base_url" {
   value = aws_api_gateway_deployment.iot.invoke_url
 }

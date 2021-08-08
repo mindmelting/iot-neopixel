@@ -1,5 +1,3 @@
-data "aws_iot_endpoint" "iot" {}
-
 resource "aws_lambda_function" "iot_gh_event" {
   function_name    = "iot-google-home-event"
   filename         = "./lambda/build/lambda.zip"

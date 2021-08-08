@@ -1,3 +1,5 @@
+data "aws_iot_endpoint" "iot" {}
+
 resource "aws_iot_thing" "iot_thing" {
   count = length(var.things)
   name  = var.things[count.index]
