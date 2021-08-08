@@ -51,6 +51,9 @@ const transformDeltaState = (deltaState: IoTShadowState): GHState => {
 };
 
 const handler = async (event: IoTRuleEvent) => {
+
+  console.log(event);
+
   const deviceName = event.thing_id;
 
   const updatedState = transformDeltaState(event.state);
