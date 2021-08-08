@@ -20,8 +20,9 @@ interface IoTRuleEvent {
 }
 
 const googleServiceJSON =
-  process.env.GOOGLE_SERVICE_ACCOUNT_JSON &&
-  JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  (process.env.GOOGLE_SERVICE_ACCOUNT_JSON &&
+    JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)) ||
+  {};
 
 const app = homegraph({
   version: "v1",
@@ -29,7 +30,7 @@ const app = homegraph({
     projectId: googleServiceJSON.project_id,
     credentials: {
       client_email: googleServiceJSON.client_email,
-      private_key: googleServiceJSON.private_key
+      private_key: googleServiceJSON.private_key,
     },
     scopes: ["https://www.googleapis.com/auth/homegraph"],
   }),
