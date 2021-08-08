@@ -28,14 +28,9 @@ resource "aws_lambda_function" "iot_gh_state" {
 
   environment {
     variables = {
-      "IOT_ENDPOINT"          = data.aws_iot_endpoint.iot.endpoint_address
-      "IOT_THINGS"            = join(",", aws_iot_thing.iot_thing.*.name)
-      "GOOGLE_PROJECT_ID"     = var.google_project_id
-      "GOOGLE_PRIVATE_KEY_ID" = var.google_private_key_id
-      "GOOGLE_PRIVATE_KEY"    = var.google_private_key
-      "GOOGLE_CLIENT_EMAIL"   = var.google_client_email
-      "GOOGLE_CLIENT_ID"      = var.google_client_id
-      "GOOGLE_X509_CERT_URL"  = var.google_x509_cert_url
+      "IOT_ENDPOINT"                = data.aws_iot_endpoint.iot.endpoint_address
+      "IOT_THINGS"                  = join(",", aws_iot_thing.iot_thing.*.name)
+      "GOOGLE_SERVICE_ACCOUNT_JSON" = var.google_service_account_json
     }
   }
 }
