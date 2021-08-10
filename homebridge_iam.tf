@@ -19,12 +19,12 @@ resource "aws_iam_policy" "iot_homebridge_iam_policy" {
   })
 }
 
-resource "aws_iam_user_policy_attachment" "homebridge_attachment" {
+resource "aws_iam_user_policy_attachment" "homebridge_shadow_attachment" {
   user       = aws_iam_user.homebridge_iam_user.name
   policy_arn = aws_iam_policy.iot_shadow_iam_policy.arn
 }
 
-resource "aws_iam_user_policy_attachment" "homebridge_attachment" {
+resource "aws_iam_user_policy_attachment" "homebridge_list_attachment" {
   user       = aws_iam_user.homebridge_iam_user.name
   policy_arn = aws_iam_policy.iot_homebridge_iam_policy.arn
 }
