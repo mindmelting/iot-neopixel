@@ -2,7 +2,7 @@
 
 import { IotData } from "aws-sdk";
 import { smarthome } from "actions-on-google";
-import colorconvert from "color-convert";
+import * as colorconvert from "color-convert";
 
 import logger from './utils/logger';
 
