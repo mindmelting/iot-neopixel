@@ -19,10 +19,11 @@ interface IoTRuleEvent {
   state: IoTShadowState;
 }
 
-const googleServiceJSON =
-  (process.env.GOOGLE_SERVICE_ACCOUNT_JSON &&
-    JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)) ||
-  {};
+if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+  throw new Error("Requires GOOGLE_SERVICE_ACCOUNT_JSON");
+}
+
+const googleServiceJSON = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
 
 const app = homegraph({
   version: "v1",
