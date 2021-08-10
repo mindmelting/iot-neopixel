@@ -55,7 +55,7 @@ const getBrightnessParam = ({ brightness }: { brightness: number }) => {
 
 const getRGBParam = (params: ColorCommand) => {
   const hsv = params.color.spectrumHSV;
-  const rgb = colorconvert.hsv.rgb([hsv.hue, hsv.saturation, hsv.value]);
+  const rgb = colorconvert.hsv.rgb([hsv.hue, hsv.saturation * 100, hsv.value * 100]);
 
   return {
     color: {
@@ -170,8 +170,8 @@ app.onQuery(async (body) => {
             color: {
               spectrumHsv: {
                 hue: hsv[0],
-                saturation: hsv[1],
-                value: hsv[2],
+                saturation: hsv[1] / 100,
+                value: hsv[2] / 100,
               },
             },
             status: "SUCCESS",

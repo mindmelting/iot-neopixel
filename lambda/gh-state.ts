@@ -69,8 +69,8 @@ const transformDeltaState = (deltaState: IoTShadowState): GHState => {
     state.color = {
       spectrumHsv: {
         hue: hsv[0],
-        saturation: hsv[1],
-        value: hsv[2]
+        saturation: hsv[1] / 100,
+        value: hsv[2] / 100
       }
     }
   }
