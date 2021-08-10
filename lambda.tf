@@ -36,7 +36,7 @@ resource "aws_lambda_function" "iot_gh_state" {
 resource "aws_lambda_layer_version" "node_layer" {
   layer_name          = "iot-node-layer"
   filename            = "./lambda/build/layer.zip"
-  source_code_hash    = filebase64sha256("./lambda/package.json")
+  source_code_hash    = filebase64sha256("./lambda/build/layer.zip")
   compatible_runtimes = ["nodejs14.x"]
 
 }
