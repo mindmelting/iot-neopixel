@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { GoogleAuth } from "google-auth-library";
 import { homegraph } from "@googleapis/homegraph";
 
+import logger from './utils/logger';
+
 interface IoTShadowState {
   light?: string;
   brightness?: number;
@@ -52,11 +54,9 @@ const transformDeltaState = (deltaState: IoTShadowState): GHState => {
 };
 
 const handler = async (event: IoTRuleEvent) => {
-
-  console.log(event);
+  logger.info(event, "Event received");
 
   const deviceName = event.thing_id;
-
   const updatedState = transformDeltaState(event.state);
 
   const response = await app.devices.reportStateAndNotification({
@@ -73,7 +73,7 @@ const handler = async (event: IoTRuleEvent) => {
     },
   });
 
-  console.log(response);
+  logger.info(response, "Response from Google Homegraph");
 };
 
 export { handler };

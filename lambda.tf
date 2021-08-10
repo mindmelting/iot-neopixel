@@ -2,7 +2,7 @@ resource "aws_lambda_function" "iot_gh_event" {
   function_name    = "iot-google-home-event"
   filename         = "./lambda/build/lambda.zip"
   source_code_hash = filebase64sha256("./lambda/build/lambda.zip")
-  handler          = "main.ghevent"
+  handler          = "gh-event.handler"
   runtime          = "nodejs14.x"
   layers           = [aws_lambda_layer_version.node_layer.arn]
 
@@ -20,7 +20,7 @@ resource "aws_lambda_function" "iot_gh_state" {
   function_name    = "iot-google-report-state"
   filename         = "./lambda/build/lambda.zip"
   source_code_hash = filebase64sha256("./lambda/build/lambda.zip")
-  handler          = "main.ghstate"
+  handler          = "gh-state.handler"
   runtime          = "nodejs14.x"
   layers           = [aws_lambda_layer_version.node_layer.arn]
 
@@ -28,8 +28,6 @@ resource "aws_lambda_function" "iot_gh_state" {
 
   environment {
     variables = {
-      "IOT_ENDPOINT"                = data.aws_iot_endpoint.iot.endpoint_address
-      "IOT_THINGS"                  = join(",", aws_iot_thing.iot_thing.*.name)
       "GOOGLE_SERVICE_ACCOUNT_JSON" = var.google_service_account_json
     }
   }

@@ -3,6 +3,8 @@
 import { IotData } from "aws-sdk";
 import { smarthome } from "actions-on-google";
 
+import logger from './utils/logger';
+
 // Create an app instance
 const app = smarthome({
   debug: true,
@@ -46,7 +48,8 @@ const COMMAND_MAP: ICommandOptions = {
 
 // This needs refactoring to capture multiple commands
 app.onExecute(async (body) => {
-  console.log("Execute");
+  logger.info(body, "Received EXECUTE event");
+
   const deviceIds = body.inputs[0].payload.commands[0].devices.map(device => device.id);
   const currParams = body.inputs[0].payload.commands[0].execution.reduce(
     (prev, curr) => {
@@ -96,7 +99,7 @@ app.onExecute(async (body) => {
 });
 
 app.onQuery(async (body) => {
-  console.log("Query");
+  logger.info(body, "Received QUERY event");
 
   const deviceIds = body.inputs[0].payload.devices.map(device => device.id);
 
@@ -126,7 +129,8 @@ app.onQuery(async (body) => {
 });
 
 app.onSync(async (body) => {
-  console.log("Sync");
+  logger.info(body, "Received SYNC event");
+
   return {
     requestId: body.requestId,
     payload: {
