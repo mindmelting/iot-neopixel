@@ -3,17 +3,30 @@
 import { v4 as uuidv4 } from "uuid";
 import { GoogleAuth } from "google-auth-library";
 import { homegraph } from "@googleapis/homegraph";
+import colorconvert from "color-convert";
 
 import logger from './utils/logger';
 
 interface IoTShadowState {
   light?: string;
   brightness?: number;
+  color?: {
+    red: number
+    green: number
+    blue: number
+  }
 }
 
 interface GHState {
   on?: boolean;
   brightness?: number;
+  color?: {
+    spectrumHsv: {
+      hue: number
+      saturation: number
+      value: number
+    }
+  }
 }
 
 interface IoTRuleEvent {
@@ -48,6 +61,18 @@ const transformDeltaState = (deltaState: IoTShadowState): GHState => {
 
   if (deltaState.hasOwnProperty("brightness")) {
     state.brightness = Math.round((deltaState.brightness! / 255) * 100);
+  }
+
+  if (deltaState.hasOwnProperty("color")) {
+    const rgb = deltaState.color!;
+    const hsv = colorconvert.rgb.hsv([rgb.red, rgb.green, rgb.blue]);
+    state.color = {
+      spectrumHsv: {
+        hue: hsv[0],
+        saturation: hsv[1],
+        value: hsv[2]
+      }
+    }
   }
 
   return state;

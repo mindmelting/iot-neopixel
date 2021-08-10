@@ -2,8 +2,19 @@
 
 import { IotData } from "aws-sdk";
 import { smarthome } from "actions-on-google";
+import colorconvert from "color-convert";
 
 import logger from './utils/logger';
+
+interface Hsv {
+  hue: number
+  saturation: number
+  value: number
+}
+
+interface ICommandOptions {
+  [key: string]: Function;
+}
 
 // Create an app instance
 const app = smarthome({
@@ -37,13 +48,22 @@ const getBrightnessParam = ({ brightness }: { brightness: number }) => {
   };
 };
 
-interface ICommandOptions {
-  [key: string]: Function;
-}
+const getRGBParam = ({ hue, saturation, value }: Hsv) => {
+  const rgb = colorconvert.hsv.rgb([hue, saturation, value]);
+
+  return {
+    color: {
+      red: rgb[0],
+      green: rgb[1],
+      blue: rgb[2]
+    }
+  }
+};
 
 const COMMAND_MAP: ICommandOptions = {
   "action.devices.commands.OnOff": getToggleParams,
   "action.devices.commands.BrightnessAbsolute": getBrightnessParam,
+  "action.devices.commands.ColorAbsolute": getRGBParam,
 };
 
 // This needs refactoring to capture multiple commands
@@ -113,6 +133,13 @@ app.onQuery(async (body) => {
       devices: payloads.reduce((curr, payload, idx) => {
         const reportedBrightness = payload.state.reported.brightness || 0;
         const brightness = Math.round((reportedBrightness / 255) * 100);
+        
+        const reportedColor = payload.state.reported.color;
+        let hsv = [0,0,0];
+
+        if (reportedColor) {
+          hsv = colorconvert.rgb.hsv([reportedColor.red, reportedColor.green, reportedColor.blue]);
+        }
 
         return {
           ...curr,
@@ -120,6 +147,13 @@ app.onQuery(async (body) => {
             online: true,
             on: payload.state.reported.light === "on",
             brightness,
+            color: {
+              spectrumHsv: {
+                hue: hsv[0],
+                saturation: [1],
+                value: [2]
+              }
+            },
             status: "SUCCESS",
           }
         }
@@ -141,7 +175,11 @@ app.onSync(async (body) => {
         traits: [
           "action.devices.traits.OnOff",
           "action.devices.traits.Brightness",
+          "action.devices.traits.ColorSetting"
         ],
+        attributes: {
+          colorModel: "hsv"
+        },
         name: {
           name: thingName,
           defaultNames: ["reading light"],

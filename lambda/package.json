@@ -12,13 +12,15 @@
   "dependencies": {
     "@googleapis/homegraph": "^2.0.0",
     "actions-on-google": "^2.13.0",
+    "color-convert": "^2.0.1",
     "google-auth-library": "^7.5.0",
     "pino": "^7.0.0-rc.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/node": "^16.4.13",
     "@tsconfig/node14": "^1.0.1",
+    "@types/color-convert": "^2.0.0",
+    "@types/node": "^16.4.13",
     "@types/uuid": "^8.3.1",
     "aws-sdk": "^2.742.0"
   }
