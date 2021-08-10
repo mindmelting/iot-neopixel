@@ -63,7 +63,7 @@ resource "aws_iot_topic_rule" "delta_iot_topic_rule" {
   name        = "iot_delta_rule"
   description = "Shadow Delta rule"
   enabled     = true
-  sql         = "SELECT state.reported as state, topic(3) as thing_id FROM '$aws/things/+/shadow/update/delta' WHERE NOT isUndefined(state.reported)"
+  sql         = "SELECT state.reported as state, topic(3) as thing_id FROM '$aws/things/+/shadow/update/accepted' WHERE NOT isUndefined(state.reported)"
   sql_version = "2016-03-23"
 
   lambda {
