@@ -4,12 +4,17 @@ import { IotData } from "aws-sdk";
 import { smarthome } from "actions-on-google";
 import * as colorconvert from "color-convert";
 
-import logger from './utils/logger';
+import logger from "./utils/logger";
 
-interface Hsv {
-  hue: number
-  saturation: number
-  value: number
+interface ColorCommand {
+  color: {
+    name: string;
+    spectrumHSV: {
+      hue: number;
+      saturation: number;
+      value: number;
+    };
+  };
 }
 
 interface ICommandOptions {
@@ -48,16 +53,17 @@ const getBrightnessParam = ({ brightness }: { brightness: number }) => {
   };
 };
 
-const getRGBParam = ({ hue, saturation, value }: Hsv) => {
-  const rgb = colorconvert.hsv.rgb([hue, saturation, value]);
+const getRGBParam = (params: ColorCommand) => {
+  const hsv = params.color.spectrumHSV;
+  const rgb = colorconvert.hsv.rgb([hsv.hue, hsv.saturation, hsv.value]);
 
   return {
     color: {
       red: rgb[0],
       green: rgb[1],
-      blue: rgb[2]
-    }
-  }
+      blue: rgb[2],
+    },
+  };
 };
 
 const COMMAND_MAP: ICommandOptions = {
@@ -70,7 +76,9 @@ const COMMAND_MAP: ICommandOptions = {
 app.onExecute(async (body) => {
   logger.info(body, "Received EXECUTE event");
 
-  const deviceIds = body.inputs[0].payload.commands[0].devices.map(device => device.id);
+  const deviceIds = body.inputs[0].payload.commands[0].devices.map(
+    (device) => device.id
+  );
   const currParams = body.inputs[0].payload.commands[0].execution.reduce(
     (prev, curr) => {
       return {
@@ -92,14 +100,20 @@ app.onExecute(async (body) => {
     {}
   );
 
-  await Promise.all(deviceIds.map(id => iotdata.updateThingShadow({
-    thingName: id,
-    payload: JSON.stringify({
-      state: {
-        desired: desiredParams,
-      },
-    }),
-  }).promise()));
+  await Promise.all(
+    deviceIds.map((id) =>
+      iotdata
+        .updateThingShadow({
+          thingName: id,
+          payload: JSON.stringify({
+            state: {
+              desired: desiredParams,
+            },
+          }),
+        })
+        .promise()
+    )
+  );
 
   return {
     requestId: body.requestId,
@@ -110,7 +124,7 @@ app.onExecute(async (body) => {
           status: "SUCCESS",
           states: {
             online: true,
-            ...currParams
+            ...currParams,
           },
         },
       ],
@@ -121,10 +135,12 @@ app.onExecute(async (body) => {
 app.onQuery(async (body) => {
   logger.info(body, "Received QUERY event");
 
-  const deviceIds = body.inputs[0].payload.devices.map(device => device.id);
+  const deviceIds = body.inputs[0].payload.devices.map((device) => device.id);
 
-  const res = await Promise.all(deviceIds.map(id => iotdata.getThingShadow({ thingName: id }).promise()));
-  const payloads = res.map(el => JSON.parse(el.payload!.toString()));
+  const res = await Promise.all(
+    deviceIds.map((id) => iotdata.getThingShadow({ thingName: id }).promise())
+  );
+  const payloads = res.map((el) => JSON.parse(el.payload!.toString()));
 
   return {
     requestId: body.requestId,
@@ -133,12 +149,16 @@ app.onQuery(async (body) => {
       devices: payloads.reduce((curr, payload, idx) => {
         const reportedBrightness = payload.state.reported.brightness || 0;
         const brightness = Math.round((reportedBrightness / 255) * 100);
-        
+
         const reportedColor = payload.state.reported.color;
-        let hsv = [0,0,0];
+        let hsv = [0, 0, 0];
 
         if (reportedColor) {
-          hsv = colorconvert.rgb.hsv([reportedColor.red, reportedColor.green, reportedColor.blue]);
+          hsv = colorconvert.rgb.hsv([
+            reportedColor.red,
+            reportedColor.green,
+            reportedColor.blue,
+          ]);
         }
 
         return {
@@ -150,13 +170,13 @@ app.onQuery(async (body) => {
             color: {
               spectrumHsv: {
                 hue: hsv[0],
-                saturation: [1],
-                value: [2]
-              }
+                saturation: hsv[1],
+                value: hsv[2],
+              },
             },
             status: "SUCCESS",
-          }
-        }
+          },
+        };
       }, {}),
     },
   };
@@ -175,10 +195,10 @@ app.onSync(async (body) => {
         traits: [
           "action.devices.traits.OnOff",
           "action.devices.traits.Brightness",
-          "action.devices.traits.ColorSetting"
+          "action.devices.traits.ColorSetting",
         ],
         attributes: {
-          colorModel: "hsv"
+          colorModel: "hsv",
         },
         name: {
           name: thingName,
