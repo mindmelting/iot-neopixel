@@ -13,7 +13,7 @@ resource "aws_iam_policy" "iot_homebridge_iam_policy" {
         Action = [
           "iot:ListThings",
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
       },
     ]
   })
